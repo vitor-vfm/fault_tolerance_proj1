@@ -1,26 +1,61 @@
-import java.util.List;
+import java.util.*;
+import java.io.*;
 
 class DataGenerator {
 
     public static void main(String[] args) {
-        if (args.length != 3)
-            throw new IllegalArgumentException("Wrong number of arguments");
+        if (args.length != 2) {
+            System.out.println("Wrong number of arguments");
+            System.exit(1);
+        }
 
-        String outputFile = args[1];
-        int N = Integer.parseInt(args[2]);
+        String outputFile = args[0];
+        int N = Integer.parseInt(args[1]);
 
-        if (N < 0)
-            throw new IllegalArgumentException("Number of integers needs to be a non-negative number");
+        if (N < 0) {
+            System.out.println("Number of integers needs to be a non-negative number");
+            System.exit(1);
+        }
         
         List<Integer> randomInts = generateRandomIntegers(N);
 
-        outputResult(outputFile, randomInts);
+        try {
+            outputResult(outputFile, randomInts);
+        } catch (IOException ioe) {
+            System.out.println("There was a problem writing to file: ");
+            System.out.println(ioe.getMessage());
+            System.exit(1);
+        }
+
     }
 
     static List<Integer> generateRandomIntegers(int N) {
-        return null;
+        Random rnd = new Random();
+
+        List<Integer> res = new ArrayList<Integer>(N);
+
+        while (res.size() < N) {
+            res.add(rnd.nextInt());
+        }
+
+        return res;
     }
 
-    static void outputResult(String outputFile, List<Integer> numbers) {
+    static void outputResult(String outputFile, List<Integer> numbers) throws IOException {
+        FileWriter fw = null;
+
+        try {
+            fw = new FileWriter(outputFile);
+
+            if (!numbers.isEmpty()) {
+                fw.write(numbers.get(0).toString());
+                for (int i = 1; i < numbers.size(); i++) {
+                    fw.write(',');
+                    fw.write(String.valueOf(numbers.get(i).toString()));
+                }
+            }
+        } finally {
+            fw.close();
+        }
     }
 }
