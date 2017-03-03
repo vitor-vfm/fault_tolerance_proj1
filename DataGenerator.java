@@ -47,12 +47,9 @@ class DataGenerator {
         try {
             fw = new FileWriter(outputFile);
 
-            if (!numbers.isEmpty()) {
-                fw.write(numbers.get(0).toString());
-                for (int i = 1; i < numbers.size(); i++) {
-                    fw.write(',');
-                    fw.write(String.valueOf(numbers.get(i).toString()));
-                }
+            for (Integer nbr : numbers) {
+                fw.write(nbr.toString());
+                fw.write('\n');
             }
         } finally {
             fw.close();
