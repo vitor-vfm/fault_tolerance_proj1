@@ -3,21 +3,24 @@ import java.util.*;
 public class Executive {
 
     private class SuccessFlag {
-        boolean flag = true;
+        boolean flag = false;
 
         public boolean success() {return flag;}
-        public void setFalse() {flag = false;}
+        public void setTrue() {flag = true;}
     }
 
     int[] originalData;
     double primaryFailRate;
     double backupFailRate;
+    long timeout;
     Adjudicator adjudicator;
 
-    public Executive(int[] originalData, double primaryFailRate, double backupFailRate) {
+    public Executive(int[] originalData, double primaryFailRate, double backupFailRate, long timeout) {
         this.originalData = originalData;
         this.primaryFailRate = primaryFailRate;
         this.backupFailRate = backupFailRate;
+        this.timeout = timeout;
+
         this.adjudicator = new Adjudicator(originalData);
     }
 
@@ -28,16 +31,19 @@ public class Executive {
             public void run() {
                 try {
                     Heapsort.sort(primaryInput, primaryFailRate);
+                    successFlag.setTrue();
                 } catch (RuntimeException re) {
                     System.out.println(re);
-                    successFlag.setFalse();
                 }
             }
         });
 
+        Timer timer = new Timer();
+        timer.schedule(new Watchdog(primaryThread), timeout);
+        primaryThread.start();
         try {
-            primaryThread.start();
             primaryThread.join();
+            timer.cancel();
             if (successFlag.success() && adjudicator.acceptanceTest(primaryInput))
                 return primaryInput;
             else
@@ -55,18 +61,22 @@ public class Executive {
             public void run() {
                 try {
                     InsertionSort.sort(backupInput, backupFailRate);
+                    successFlag.setTrue();
                 } catch (RuntimeException re) {
                     System.out.println(re);
-                    successFlag.setFalse();
                 }
             }
         });
 
         FailureException fe = new FailureException("Both the primary variant and the backup failed");
 
+        Timer timer = new Timer();
+        timer.schedule(new Watchdog(backupThread), timeout);
+        backupThread.start();
+
         try {
-            backupThread.start();
             backupThread.join();
+            timer.cancel();
             if (successFlag.success() && adjudicator.acceptanceTest(backupInput)) {
                 return backupInput;
             } else {
