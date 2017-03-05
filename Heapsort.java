@@ -95,7 +95,7 @@ public class Heapsort {
         double hazard = count * failureProbability;
         double result = new Random().nextDouble();
         if (0.5 <= result && result <= (0.5 + hazard)) {
-            throw new RuntimeException("Memory access failure");
+            throw new RuntimeException("Memory access error in Heapsort");
         }
     }
 }
