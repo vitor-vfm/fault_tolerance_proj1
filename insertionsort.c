@@ -24,6 +24,12 @@ int insertsort(int arr[], int size) {
 }
 
 JNIEXPORT jint JNICALL Java_InsertionSort_insertsort (JNIEnv * env, jclass class, jintArray arr, jdouble prob) {
-    return (jint) insertsort((*env)->GetIntArrayElements(env, arr, 0), (*env)->GetArrayLength(env, arr));
+    int size = (*env)->GetArrayLength(env, arr);
+    int * body = (*env)->GetIntArrayElements(env, arr, 0);
+
+    jint result = insertsort(body, size);
+    (*env)->ReleaseIntArrayElements(env, arr, body, 0);
+
+    return result;
 }
 
