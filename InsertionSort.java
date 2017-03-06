@@ -2,15 +2,13 @@ import java.util.*;
 
 public class InsertionSort {
 
-    private static int insert_sort(int[] numbers, double failureRate) {
-        // TODO: dummy; make native
-        Arrays.sort(numbers);
-        return (new Random().nextDouble() <= failureRate/100.0) ? 1 : 0;
-    }
+    static native int insertsort(int[] numbers, double failureRate);
 
     public static void sort(int[] numbers, double failureRate) {
 
-        int result = insert_sort(numbers, failureRate);
+        System.loadLibrary("insertionsort");
+        int result = insertsort(numbers, failureRate);
+        System.out.println(result);
         if (result != 0) {
             throw new RuntimeException("Memory access error in InsertionSort");
         }
